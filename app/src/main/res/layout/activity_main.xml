@@ -15,20 +15,36 @@
         android:text="Aula studio 1" />
 
     <TextView
-        android:id="@+id/dataReceived"
+        android:id="@+id/aulastudio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Hello World!"
         android:textAlignment="center" />
 
+    <TextView
+        android:id="@+id/aula3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="gdxg" />
+
+    <ProgressBar
+        android:id="@+id/aula3progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="77dp"
+        android:max="50"
+        android:progress="0"
+        android:visibility="visible"
+        tools:visibility="visible" />
+
     <Button
-        android:id="@+id/aula2"
+        android:id="@+id/bottone2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="aula2" />
 
     <TextView
-        android:id="@+id/valore2"
+        android:id="@+id/aula2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView"

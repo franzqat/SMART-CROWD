@@ -52,18 +52,18 @@ public class MqttHelper {
 
 
 
-        connect(context);
+        connect();
     }
 
     public void setCallback(MqttCallbackExtended callback) {
         mqttAndroidClient.setCallback(callback);
     }
 
-    private void connect(Context context){
+    private void connect(){
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
 
         mqttConnectOptions.setAutomaticReconnect(true);
-        mqttConnectOptions.setCleanSession(false);
+        mqttConnectOptions.setCleanSession(true);
         mqttConnectOptions.setUserName(username);
         mqttConnectOptions.setPassword(password.toCharArray());
 
@@ -97,12 +97,12 @@ public class MqttHelper {
     }
 
 
-    public void subscribeToTopic(String subscriptionTopic) {
+    public void subscribeToTopic(final String subscriptionTopic) {
         try {
             mqttAndroidClient.subscribe(subscriptionTopic, 1, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.w("Mqtt","Subscribed!");
+                    Log.w("Mqtt","Subscribed! To " + subscriptionTopic);
                 }
 
                 @Override
