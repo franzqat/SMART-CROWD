@@ -13,16 +13,18 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+
+
 public class MqttHelper {
     public MqttAndroidClient mqttAndroidClient;
 
-    final String serverUri = "tcp://m24.cloudmqtt.com:18951";
+    final String serverUri = "ssl://m24.cloudmqtt.com:28951";
 
     final String clientId = "ExampleAndroidClient";
     final String subscriptionTopic = "unict/didattica/aulastudio";
 
-    final String username = "npjfazcj";
-    final String password = "H_BXhBstyAU4";
+    final String username = "mqttbox"; //"npjfazcj";
+    final String password = "123ttbox";//"H_BXhBstyAU4";
 
     public MqttHelper(Context context){
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
@@ -47,15 +49,19 @@ public class MqttHelper {
 
             }
         });
-        connect();
+
+
+
+        connect(context);
     }
 
     public void setCallback(MqttCallbackExtended callback) {
         mqttAndroidClient.setCallback(callback);
     }
 
-    private void connect(){
+    private void connect(Context context){
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+
         mqttConnectOptions.setAutomaticReconnect(true);
         mqttConnectOptions.setCleanSession(false);
         mqttConnectOptions.setUserName(username);
@@ -91,7 +97,7 @@ public class MqttHelper {
 
     private void subscribeToTopic() {
         try {
-            mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe(subscriptionTopic, 1, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.w("Mqtt","Subscribed!");

@@ -28,13 +28,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (checkPermission()) {
+    //    if (checkPermission()) {
             dataReceived = (TextView) findViewById(R.id.dataReceived);
             startMqtt();
-        } else {
-            Toast.makeText(getApplicationContext(), "Impossibile ottenere i permessi", Toast.LENGTH_LONG).show();
+  //      } else {
+   //         Toast.makeText(getApplicationContext(), "Impossibile ottenere i permessi", Toast.LENGTH_LONG).show();
         }
-    }
+   // }
 
 
 
@@ -75,12 +75,12 @@ public class MainActivity extends AppCompatActivity {
         mqttHelper.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean b, String s) {
-
+                Log.w("Mqtt","connection complete!");
             }
 
             @Override
             public void connectionLost(Throwable throwable) {
-
+                Log.w("Mqtt","connection lost!");
             }
 
             @Override
