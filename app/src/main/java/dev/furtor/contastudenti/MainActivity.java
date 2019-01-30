@@ -29,12 +29,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (checkPermission()) {
-                     dataReceived = (TextView) findViewById(R.id.dataReceived);
-
-                startMqtt();
+            dataReceived = (TextView) findViewById(R.id.dataReceived);
+            startMqtt();
         } else {
-
-            Toast.makeText(getApplicationContext(), "Impossibile inviare SMS", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Impossibile ottenere i permessi", Toast.LENGTH_LONG).show();
         }
     }
 
