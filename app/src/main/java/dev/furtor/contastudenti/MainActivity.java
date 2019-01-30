@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     MqttHelper mqttHelper;
 
     TextView dataReceived;
-    Button topic1;
+    Button topic1,topic2;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
             dataReceived = findViewById(R.id.dataReceived);
             startMqtt();
 
-
+        topic2 = findViewById(R.id.aula2);
         topic1 = findViewById(R.id.topic1);
         topic1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,7 +44,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        topic2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                  mqttHelper.subscribeToTopic("unict/didattica/aula2"); //@string aula_studio_D1
 
+            }
+        });
         }
 
 
@@ -86,7 +92,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
                 Log.w("Debug",mqttMessage.toString());
-                dataReceived.setText(mqttMessage.toString());
+               String[] result= topic.split("/");
+     //           result[result.length()-1]
+
+                findViewById(R.id.dataReceived).setText(mqttMessage.toString());
             }
 
             @Override
