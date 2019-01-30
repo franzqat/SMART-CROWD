@@ -21,7 +21,7 @@ public class MqttHelper {
     final String serverUri = "ssl://m24.cloudmqtt.com:28951";
 
     final String clientId = "ExampleAndroidClient";
-    final String subscriptionTopic = "unict/didattica/aulastudio";
+    //final String subscriptionTopic = "unict/didattica/aulastudio";
 
     final String username = "mqttbox"; //"npjfazcj";
     final String password = "123ttbox";//"H_BXhBstyAU4";
@@ -79,7 +79,9 @@ public class MqttHelper {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    subscribeToTopic();
+
+
+                   // subscribeToTopic();
                 }
 
                 @Override
@@ -95,7 +97,7 @@ public class MqttHelper {
     }
 
 
-    private void subscribeToTopic() {
+    public void subscribeToTopic(String subscriptionTopic) {
         try {
             mqttAndroidClient.subscribe(subscriptionTopic, 1, null, new IMqttActionListener() {
                 @Override
@@ -110,7 +112,7 @@ public class MqttHelper {
             });
 
         } catch (MqttException ex) {
-            System.err.println("Exception whilst subscribing");
+            System.err.println("Exception while subscribing");
             ex.printStackTrace();
         }
     }

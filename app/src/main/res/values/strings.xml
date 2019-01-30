@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ContaStudenti</string>
+    <string name="aula_studio_D1">unict/didattica/aulastudio</string>
 </resources>

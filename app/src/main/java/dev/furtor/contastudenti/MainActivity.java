@@ -3,12 +3,15 @@ package dev.furtor.contastudenti;
 
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,32 +25,29 @@ public class MainActivity extends AppCompatActivity {
     MqttHelper mqttHelper;
 
     TextView dataReceived;
-
+    Button topic1;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    //    if (checkPermission()) {
-            dataReceived = (TextView) findViewById(R.id.dataReceived);
+
+            dataReceived = findViewById(R.id.dataReceived);
             startMqtt();
-  //      } else {
-   //         Toast.makeText(getApplicationContext(), "Impossibile ottenere i permessi", Toast.LENGTH_LONG).show();
+
+
+        topic1 = findViewById(R.id.topic1);
+        topic1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              //  mqttHelper.subscribeToTopic("unict/didattica/aulastudio"); //@string aula_studio_D1
+
+            }
+        });
+
         }
-   // }
 
 
-
-    private boolean checkPermission(){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET,Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WAKE_LOCK},111);
-            return false;
-        } else {
-            return true;
-        }
-    }
 
 
     @Override
