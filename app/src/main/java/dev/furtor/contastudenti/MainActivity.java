@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
     TextView dataReceived;
     Button topic1,topic2;
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -92,10 +91,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
                 Log.w("Debug",mqttMessage.toString());
-               String[] result= topic.split("/");
-     //           result[result.length()-1]
-
-                findViewById(R.id.dataReceived).setText(mqttMessage.toString());
+                String[] result= topic.split("/");
+                dataReceived = findViewById(getResources().getIdentifier(result[result.length -1], "id", getPackageName());
+                dataReceived.setText(mqttMessage.toString());
             }
 
             @Override
