@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     private void addTextView(LinearLayout textLinearLayout, String testo) {
 
 
-        linearLayout.addView(textLinearLayout);
+        //linearLayout.addView(textLinearLayout);
         TextView textView = new TextView(this);
 
         textView.setText(testo);
@@ -165,10 +165,8 @@ public class MainActivity extends AppCompatActivity {
     private void addProgressBar(LinearLayout textLinearLayout) {
 
 
-        linearLayout.addView(textLinearLayout);
+       // linearLayout.addView(textLinearLayout);
         ProgressBar progressBar = new ProgressBar(this);
-
-
         textLinearLayout.addView(progressBar);
     }
 
