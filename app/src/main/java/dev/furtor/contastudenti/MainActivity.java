@@ -5,29 +5,34 @@ package dev.furtor.contastudenti;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.os.Handler;
+import android.graphics.PorterDuff;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import dev.furtor.contastudenti.helpers.MqttHelper;
 
 public class MainActivity extends AppCompatActivity {
     MqttHelper mqttHelper;
+    LinkedHashMap<String, ElementsStructure> map = new LinkedHashMap<>();
+
     ProgressBar pb;
     int progressStatus=0;
     TextView dataReceived, aula3;
@@ -35,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     LinearLayout linearLayout;
 
-    LinkedList<String> list = new LinkedList();
+    LinkedList<String> list = new LinkedList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,14 +53,14 @@ public class MainActivity extends AppCompatActivity {
 
         addElement(list);
 
-/*
+        startMqtt();
         pb = findViewById(R.id.aula3progress);
         aula3 = findViewById(R.id.aula3);
-
+/*
 
 
         dataReceived = findViewById(R.id.aulastudio);
-        startMqtt();
+
 
         topic2 = findViewById(R.id.bottone2);
         topic1 = findViewById(R.id.topic1);
@@ -120,12 +125,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
                 Log.w("Debug",mqttMessage.toString() + " topic " + topic);
-                String[] result= topic.split("/");
-                dataReceived = findViewById(getResources().getIdentifier(result[result.length -1], "id", getPackageName()));
-                dataReceived.setText(mqttMessage.toString());
-                progressStatus = Integer.parseInt(mqttMessage.toString());
-               // pb.setProgress(progressStatus);
-            new Thread(new UIUpdater(dataReceived,pb,progressStatus)).start();
+               //HANDLE ROUTINE;
+               ElementsStructure element = map.get(topic);
+               element.getTextView().setText(mqttMessage.toString() + "/" + element.getMaxStudenti() );
+               element.getProgressBar().setProgress(Integer.parseInt(mqttMessage.toString()));
+
+
             }
 
             @Override
@@ -140,11 +145,34 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout textLinearLayout = new LinearLayout(this);
         textLinearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(textLinearLayout);
-        for (Object s : list) {
+        ToggleButton toggleButton;
+        TextView t;
+        ProgressBar p;
+        for (final Object s : list) {
+            String[] result= s.toString().split("/");
 
-            addTextView(linearLayout, "Aula" + s.toString());
-            addTextView(linearLayout,"/100");
-            addProgressBar(linearLayout);
+            toggleButton = addButton(linearLayout, result[result.length -1] + " di " + result[result.length -2]);
+            t = addTextView(linearLayout, "/");
+            p = addProgressBar(linearLayout);
+
+
+            toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        mqttHelper.subscribeToTopic(s.toString());
+                        map.get(s.toString()).getTextView().setVisibility(View.VISIBLE);
+                        map.get(s.toString()).getProgressBar().setVisibility(View.VISIBLE);
+                    } else {
+                        mqttHelper.unsubscribeToTopic(s.toString());
+                        map.get(s.toString()).getTextView().setVisibility(View.GONE);
+                        map.get(s.toString()).getProgressBar().setVisibility(View.GONE);
+                    }
+                }
+            });
+
+            map.put(s.toString(), new ElementsStructure(toggleButton, t, p));
+
+            t.setText("/"+ map.get(s.toString()).getMaxStudenti());
 
             addLineSeperator();
             }
@@ -152,24 +180,44 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-    private void addTextView(LinearLayout textLinearLayout, String testo) {
+
+    private TextView addTextView(LinearLayout textLinearLayout, String testo) {
 
 
         //linearLayout.addView(textLinearLayout);
         TextView textView = new TextView(this);
 
         textView.setText(testo);
-        setTextViewAttributes(textView);
+
+      //  setTextViewAttributes(textView);
+        textView.setTextColor(Color.BLACK);
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         textLinearLayout.addView(textView);
-        }
-    private void addProgressBar(LinearLayout textLinearLayout) {
+        textView.setVisibility(View.GONE);
 
+        return textView;
+    }
+    private ProgressBar addProgressBar(LinearLayout textLinearLayout) {
 
-       // linearLayout.addView(textLinearLayout);
-        ProgressBar progressBar = new ProgressBar(this);
+        ProgressBar progressBar =new ProgressBar(getApplicationContext(), null, android.R.attr.progressBarStyleHorizontal);
+        // Apply the layout parameters for progress bar
+        progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
         textLinearLayout.addView(progressBar);
+        progressBar.setVisibility(View.GONE);
+        return progressBar;
     }
 
+    private ToggleButton addButton(LinearLayout textLinearLayout, String testo){
+
+        ToggleButton toggleButton = new ToggleButton(this);
+        toggleButton.
+        toggleButton.setTextOff("Monitora "+ testo);
+        toggleButton.setTextOn("Stop " + testo);
+        toggleButton.setText("Monitora " + testo);
+        linearLayout.addView(toggleButton);
+
+        return toggleButton;
+    }
 
     private void addEditTexts() {
 

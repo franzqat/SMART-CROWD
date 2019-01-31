@@ -116,4 +116,7 @@ public class MqttHelper {
             ex.printStackTrace();
         }
     }
+
+    public void unsubscribeToTopic(String s) {
+    }
 }
