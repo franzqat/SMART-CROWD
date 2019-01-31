@@ -1,12 +1,11 @@
 package dev.furtor.contastudenti;
 
-import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 public class ElementsStructure {
-    private final ToggleButton toggleButton;
+    private final Switch aSwitch;
     private final TextView textView;
     private  final ProgressBar progressBar;
     private int maxStudenti = 100; //capienza aula
@@ -19,14 +18,14 @@ public class ElementsStructure {
         this.maxStudenti = maxStudenti;
     }
 
-    public ElementsStructure(ToggleButton toggleButton, TextView textView, ProgressBar progressBar) {
-        this.toggleButton = toggleButton;
+    public ElementsStructure(Switch aSwitch, TextView textView, ProgressBar progressBar) {
+        this.aSwitch = aSwitch;
         this.textView = textView;
         this.progressBar = progressBar;
     }
 
-    public ToggleButton getToggleButton() {
-        return toggleButton;
+    public Switch getaSwitch() {
+        return aSwitch;
     }
 
     public TextView getTextView() {

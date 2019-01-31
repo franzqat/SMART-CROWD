@@ -16,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -145,18 +146,18 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout textLinearLayout = new LinearLayout(this);
         textLinearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(textLinearLayout);
-        ToggleButton toggleButton;
+        Switch aSwitch;
         TextView t;
         ProgressBar p;
         for (final Object s : list) {
             String[] result= s.toString().split("/");
 
-            toggleButton = addButton(linearLayout, result[result.length -1] + " di " + result[result.length -2]);
+            aSwitch = addButton(linearLayout, result[result.length -1] + " di " + result[result.length -2]);
             t = addTextView(linearLayout, "/");
             p = addProgressBar(linearLayout);
 
 
-            toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
                         mqttHelper.subscribeToTopic(s.toString());
@@ -170,9 +171,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            map.put(s.toString(), new ElementsStructure(toggleButton, t, p));
+            map.put(s.toString(), new ElementsStructure(aSwitch, t, p));
 
-            t.setText("/"+ map.get(s.toString()).getMaxStudenti());
+            t.setText("waiting");
 
             addLineSeperator();
             }
@@ -207,16 +208,16 @@ public class MainActivity extends AppCompatActivity {
         return progressBar;
     }
 
-    private ToggleButton addButton(LinearLayout textLinearLayout, String testo){
+    private Switch addButton(LinearLayout textLinearLayout, String testo){
 
-        ToggleButton toggleButton = new ToggleButton(this);
-        toggleButton.
-        toggleButton.setTextOff("Monitora "+ testo);
-        toggleButton.setTextOn("Stop " + testo);
-        toggleButton.setText("Monitora " + testo);
-        linearLayout.addView(toggleButton);
+        Switch aSwitch = new Switch(this);
 
-        return toggleButton;
+        //aSwitch.setTextOff("Monitora "+ testo);
+      // aSwitch.setTextOn("Stop " + testo);
+        aSwitch.setText("Monitora " + testo);
+        linearLayout.addView(aSwitch);
+
+        return aSwitch;
     }
 
     private void addEditTexts() {
