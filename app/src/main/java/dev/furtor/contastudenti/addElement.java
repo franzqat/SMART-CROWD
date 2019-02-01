@@ -5,19 +5,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 
-public class AddElementActivity extends AppCompatActivity {
+public class addElement extends AppCompatActivity {
 
-    EditText editText = findViewById(R.id.topic);
-
-  /*  public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d("Pippo", "onSaveInstanceState");
-        outState.putString("TESTO",  editText.getText().toString()); //gli to dicendo di salvare lo stato del testo
-    }*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

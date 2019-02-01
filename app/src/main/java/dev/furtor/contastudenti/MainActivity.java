@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.addelement:
-                Intent i = new Intent(this, AddElementActivity.class);
+            //    Toast.makeText(getBaseContext(),"Funzione add non ancora implementata", Toast.LENGTH_LONG).show();
+              Intent i = new Intent(this, addElement.class);
                 startActivity(i);
                 return true;
             default:
