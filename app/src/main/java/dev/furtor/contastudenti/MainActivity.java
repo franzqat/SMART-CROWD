@@ -2,6 +2,7 @@ package dev.furtor.contastudenti;
 
 
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -10,8 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -19,7 +22,6 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
@@ -34,11 +36,7 @@ public class MainActivity extends AppCompatActivity {
     MqttHelper mqttHelper;
     LinkedHashMap<String, ElementsStructure> map = new LinkedHashMap<>();
 
-    ProgressBar pb;
-    int progressStatus=0;
-    TextView dataReceived, aula3;
-    Button topic1,topic2;
-
+    TextView textView;
     LinearLayout linearLayout;
 
     LinkedList<String> list = new LinkedList<>();
@@ -46,48 +44,53 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        textView = findViewById(R.id.aulastudio);
+        //if (savedInstanceState != null) {
+      //      textView.setText(savedInstanceState.getString("TESTO"));
+      //  }
 
         popolaLista();
         linearLayout = findViewById(R.id.linear_layout);
 
 
 
-        addElement(list);
+        addElementsView(list);
 
         startMqtt();
-        pb = findViewById(R.id.aula3progress);
-        aula3 = findViewById(R.id.aula3);
-/*
 
-
-        dataReceived = findViewById(R.id.aulastudio);
-
-
-        topic2 = findViewById(R.id.bottone2);
-        topic1 = findViewById(R.id.topic1);
-        topic1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mqttHelper.subscribeToTopic("unict/didattica/aulastudio"); //@string aula_studio_D1
-
-            }
-        });
-        topic2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                  mqttHelper.subscribeToTopic("unict/didattica/aula3"); //@string aula_studio_D1
-            }
-        });
-
-
-*/
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.addelement:
+                Intent i = new Intent(this, AddElementActivity.class);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
 
     private void popolaLista() {
         list.add("unict/didattica/aulastudio");
         list.add("unict/didattica/aula1");
         list.add("unict/didattica/aula2");
         list.add("unict/didattica/aula3");
+
     }
 
     @Override
@@ -130,8 +133,6 @@ public class MainActivity extends AppCompatActivity {
                ElementsStructure element = map.get(topic);
                element.getTextView().setText(mqttMessage.toString() + "/" + element.getMaxStudenti() );
                element.getProgressBar().setProgress(Integer.parseInt(mqttMessage.toString()));
-
-
             }
 
             @Override
@@ -141,8 +142,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addElement(LinkedList list){
-        //Adding a LinearLayout with HORIZONTAL orientation
+    private void addSingleView(LinkedList list){
+
+    }
+    private void addElementsView(LinkedList list){
+        //Adding a LinearLayout with VERTICAL orientation
         LinearLayout textLinearLayout = new LinearLayout(this);
         textLinearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(textLinearLayout);
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         for (final Object s : list) {
             String[] result= s.toString().split("/");
 
-            aSwitch = addButton(linearLayout, result[result.length -1] + " di " + result[result.length -2]);
+            aSwitch = addSwitch(linearLayout, result[result.length -1] + " di " + result[result.length -2]);
             t = addTextView(linearLayout, "/");
             p = addProgressBar(linearLayout);
 
@@ -208,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
         return progressBar;
     }
 
-    private Switch addButton(LinearLayout textLinearLayout, String testo){
+    private Switch addSwitch(LinearLayout textLinearLayout, String testo){
 
         Switch aSwitch = new Switch(this);
 
@@ -250,7 +254,6 @@ public class MainActivity extends AppCompatActivity {
         editText.setLayoutParams(params);
     }
 
-
     private void setTextViewAttributes(TextView textView) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -265,13 +268,13 @@ public class MainActivity extends AppCompatActivity {
         textView.setLayoutParams(params);
     }
 
-
     //This function to convert DPs to pixels
     private int convertDpToPixel(float dp) {
         DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
         float px = dp * (metrics.densityDpi / 160f);
         return Math.round(px);
     }
+
     private void addLineSeperator() {
         LinearLayout lineLayout = new LinearLayout(this);
         lineLayout.setBackgroundColor(Color.BLACK);

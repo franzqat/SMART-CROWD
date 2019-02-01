@@ -8,19 +8,6 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/topic1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Aula studio 1" />
-
-    <TextView
-        android:id="@+id/aula3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="gdxg" />
-
     <Switch
         android:id="@+id/switch1"
         android:layout_width="match_parent"

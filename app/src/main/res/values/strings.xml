@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ContaStudenti</string>
     <string name="aula_studio_D1">unict/didattica/aulastudio</string>
+    <string name="title_activity_add_element">AddElementActivity</string>
 </resources>

@@ -21,22 +21,21 @@ public class MqttHelper {
     final String serverUri = "ssl://m24.cloudmqtt.com:28951";
 
     final String clientId = "ExampleAndroidClient";
-    //final String subscriptionTopic = "unict/didattica/aulastudio";
 
-    final String username = "mqttbox"; //"npjfazcj";
-    final String password = "123ttbox";//"H_BXhBstyAU4";
+    final String username = "mqttbox";
+    final String password = "123ttbox";
 
     public MqttHelper(Context context){
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);
         mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean b, String s) {
-                Log.w("mqtt", s);
+                Log.w("Mqtt", s);
             }
 
             @Override
             public void connectionLost(Throwable throwable) {
-
+                Log.w("Mqtt", "connection lost");
             }
 
             @Override
@@ -118,5 +117,6 @@ public class MqttHelper {
     }
 
     public void unsubscribeToTopic(String s) {
+
     }
 }
