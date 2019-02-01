@@ -9,10 +9,18 @@
     tools:showIn="@layout/activity_add_element">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="210dp"
-        android:layout_height="59dp"
-        android:text="TextView"
+        android:id="@+id/testosalvato"
+        android:layout_width="232dp"
+        android:layout_height="45dp"
+        android:text="test"
         tools:layout_editor_absoluteX="6dp"
-        tools:layout_editor_absoluteY="51dp" />
+        tools:layout_editor_absoluteY="16dp" />
+
+    <Button
+        android:id="@+id/salva"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:layout_editor_absoluteX="257dp"
+        tools:layout_editor_absoluteY="16dp" />
 </android.support.constraint.ConstraintLayout>
