@@ -10,8 +10,6 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -34,7 +32,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.lang.reflect.Array;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
@@ -52,12 +49,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         LinkedList<String> list;
         list = getStringListPref(this, "topics");
 
-        if (list == null){
-            setStringListPref(this, "topics", popolaLista(list));
-        }
 
         if(getIntent().getExtras() != null) {
             Intent i = getIntent();
@@ -69,30 +65,27 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
-        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshData(); // your code
-                pullToRefresh.setRefreshing(false);
-
-            }
-
-
-        });
-
         linearLayout = findViewById(R.id.linear_layout);
-
-        addElementsView(list);
+        if (list.isEmpty()){
+            refreshtoDefault();
+        }else {
+            addElementsView(list);
+        }
 
 
         startMqtt();
         Log.w("stato","on create");
     }
+    private void refreshtoDefault() {
+        linearLayout.removeAllViewsInLayout();
+        setStringListPref(this, "topics", popolaLista());
+        addElementsView(getStringListPref(getApplicationContext(), "topics"));
+    }
     private void refreshData() {
         linearLayout.removeAllViewsInLayout();
         addElementsView(getStringListPref(getApplicationContext(), "topics"));
     }
+
     public static void setStringListPref(Context context, String key, LinkedList<String> values) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
@@ -112,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove(key);
-     //   editor.clear();
         editor.commit();
 
     }
@@ -158,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.restore:
                 resetListPref(this, "topics");
-                refreshData();
+                refreshtoDefault();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -168,7 +160,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private LinkedList<String> popolaLista(LinkedList<String> list) {
+    private LinkedList<String> popolaLista() {
+        LinkedList<String> list = new LinkedList<>();
         list.add("unict/didattica/aulastudio");
         list.add("unict/didattica/aula1");
         list.add("unict/didattica/aula2");

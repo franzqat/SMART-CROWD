@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 
@@ -41,17 +42,34 @@ public class addElement extends AppCompatActivity {
 
                 //Set the Data to pass
                 EditText testosalvato = findViewById(R.id.testosalvato);
-                ;
 
+                try {
                 String txtData = testosalvato.getText().toString();
+                if (!checkTesto(txtData)){
+                    throw new Exception();
+                }
                 i.putExtra("txtData", txtData);
                 startActivity(i);
+
+                } catch (Exception e) {
+                    //formato di toast topic non valido
+                    Toast.makeText(getBaseContext(),"Formato Topic non valido", Toast.LENGTH_LONG).show();
+
+                }
+
+
+
             }
 
 
         });
     }
 
+    private boolean checkTesto(String txtData) {
+        if (txtData.split("/").length <= 2)
+            return false;
+        return true;
+    }
 
 
 }
