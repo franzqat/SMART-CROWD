@@ -2,11 +2,14 @@ package dev.furtor.contastudenti;
 
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -26,7 +29,10 @@ import android.widget.Toast;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONArray;
+import org.json.JSONException;
 
+import java.lang.reflect.Array;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
@@ -44,21 +50,67 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView = findViewById(R.id.aulastudio);
-        //if (savedInstanceState != null) {
-      //      textView.setText(savedInstanceState.getString("TESTO"));
-      //  }
+
+        if(getIntent().getExtras() != null) {
+        Intent i = getIntent();
+        //The second parameter below is the default string returned if the value is not there.
+
+            String txtData = i.getExtras().getString("txtData", "");
+            list = getStringListPref(this, "urls");
+            list.add(txtData);
+            setStringListPref(this, "urls", list);
+
+            //list.addFirst(txtData);
+        }
+
+
+        // retrieve preference
+
 
         popolaLista();
         linearLayout = findViewById(R.id.linear_layout);
 
-
-
         addElementsView(list);
-
+        Log.w("list",list.toString());
         startMqtt();
 
     }
+
+    public static void setStringListPref(Context context, String key, LinkedList<String> values) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        JSONArray a = new JSONArray();
+        for (int i = 0; i < values.size(); i++) {
+            a.put(values.get(i));
+        }
+        if (!values.isEmpty()) {
+            editor.putString(key, a.toString());
+        } else {
+            editor.putString(key, null);
+        }
+        editor.commit();
+    }
+
+
+    public static LinkedList<String> getStringListPref(Context context, String key) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String json = prefs.getString(key, null);
+        LinkedList<String> urls = new LinkedList<String>();
+        if (json != null) {
+            try {
+                JSONArray a = new JSONArray(json);
+                for (int i = 0; i < a.length(); i++) {
+                    String url = a.optString(i);
+                    urls.add(url);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return urls;
+    }
+
+
 
 
     @Override

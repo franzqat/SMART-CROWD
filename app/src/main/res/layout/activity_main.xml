@@ -8,29 +8,6 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Switch
-        android:id="@+id/switch1"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Monitora aula studio didattica" />
-
-    <TextView
-        android:id="@+id/aulastudio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="0/100"
-        android:textAlignment="center" />
-
-    <ProgressBar
-        android:id="@+id/aula3progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="28dp"
-        android:max="50"
-        android:progress="0"
-        android:visibility="visible"
-        tools:visibility="visible" />
-
     <ToggleButton
         android:id="@+id/toggleButton"
         android:layout_width="match_parent"
