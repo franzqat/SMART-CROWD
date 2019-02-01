@@ -10,6 +10,8 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -45,37 +47,52 @@ public class MainActivity extends AppCompatActivity {
     TextView textView;
     LinearLayout linearLayout;
 
-    LinkedList<String> list = new LinkedList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        LinkedList<String> list;
+        list = getStringListPref(this, "topics");
+
+        if (list == null){
+            setStringListPref(this, "topics", popolaLista(list));
+        }
 
         if(getIntent().getExtras() != null) {
-        Intent i = getIntent();
-        //The second parameter below is the default string returned if the value is not there.
-
+            Intent i = getIntent();
             String txtData = i.getExtras().getString("txtData", "");
-            list = getStringListPref(this, "urls");
-            list.add(txtData);
-            setStringListPref(this, "urls", list);
+            // retrieve preference
 
-            //list.addFirst(txtData);
+            list.add(txtData);
+            setStringListPref(this, "topics", list);
         }
 
 
-        // retrieve preference
+        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshData(); // your code
+                pullToRefresh.setRefreshing(false);
+
+            }
 
 
-        popolaLista();
+        });
+
         linearLayout = findViewById(R.id.linear_layout);
 
         addElementsView(list);
-        Log.w("list",list.toString());
+
+
         startMqtt();
-
+        Log.w("stato","on create");
     }
-
+    private void refreshData() {
+        linearLayout.removeAllViewsInLayout();
+        addElementsView(getStringListPref(getApplicationContext(), "topics"));
+    }
     public static void setStringListPref(Context context, String key, LinkedList<String> values) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
@@ -89,8 +106,16 @@ public class MainActivity extends AppCompatActivity {
             editor.putString(key, null);
         }
         editor.commit();
-    }
 
+    }
+    private void resetListPref(Context context, String key) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(key);
+     //   editor.clear();
+        editor.commit();
+
+    }
 
     public static LinkedList<String> getStringListPref(Context context, String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -131,6 +156,10 @@ public class MainActivity extends AppCompatActivity {
               Intent i = new Intent(this, addElement.class);
                 startActivity(i);
                 return true;
+            case R.id.restore:
+                resetListPref(this, "topics");
+                refreshData();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -138,12 +167,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void popolaLista() {
+
+    private LinkedList<String> popolaLista(LinkedList<String> list) {
         list.add("unict/didattica/aulastudio");
         list.add("unict/didattica/aula1");
         list.add("unict/didattica/aula2");
         list.add("unict/didattica/aula3");
 
+        return list;
     }
 
     @Override
@@ -195,9 +226,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addSingleView(LinkedList list){
-
-    }
     private void addElementsView(LinkedList list){
         //Adding a LinearLayout with VERTICAL orientation
         LinearLayout textLinearLayout = new LinearLayout(this);
@@ -207,12 +235,14 @@ public class MainActivity extends AppCompatActivity {
         TextView t;
         ProgressBar p;
         for (final Object s : list) {
-            String[] result= s.toString().split("/");
+            String[] result = s.toString().split("/");
 
-            aSwitch = addSwitch(linearLayout, result[result.length -1] + " di " + result[result.length -2]);
+            aSwitch = addSwitch(linearLayout, result[result.length - 1] + " di " + result[result.length - 2]);
+
+//}catch (ArrayIndexOutOfBoundsException e){
+
             t = addTextView(linearLayout, "/");
             p = addProgressBar(linearLayout);
-
 
             aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
