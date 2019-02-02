@@ -116,7 +116,26 @@ public class MqttHelper {
         }
     }
 
-    public void unsubscribeToTopic(String s) {
+    public void unsubscribeToTopic(final String subscriptionTopic) {
+        try {
+            mqttAndroidClient.unsubscribe(subscriptionTopic, null, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+
+                    Log.w("Mqtt", "Unsubscribed with success from "+ subscriptionTopic);
+                }
+
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Log.w("Mqtt", "unsubscription fail!");
+                }
+            });
+
+        } catch (MqttException ex) {
+            System.err.println("Exception while subscribing");
+            ex.printStackTrace();
+        }
+
 
     }
 }

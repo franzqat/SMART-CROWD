@@ -31,6 +31,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -38,21 +39,18 @@ import java.util.LinkedList;
 import dev.furtor.contastudenti.helpers.MqttHelper;
 
 public class MainActivity extends AppCompatActivity {
+
     MqttHelper mqttHelper;
     LinkedHashMap<String, ElementsStructure> map = new LinkedHashMap<>();
-
-    TextView textView;
     LinearLayout linearLayout;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        LinkedList<String> list;
-        list = getStringListPref(this, "topics");
+        LinkedList<Topic> list;
+        list = getTopicListPref(this, "topics");
 
 
         if(getIntent().getExtras() != null) {
@@ -60,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
             String txtData = i.getExtras().getString("txtData", "");
             // retrieve preference
 
-            list.add(txtData);
-            setStringListPref(this, "topics", list);
+            list.add(new Topic(txtData)); //default 100 studenti max
+            setTopicListPref(this, "topics", list);
         }
 
 
@@ -78,23 +76,32 @@ public class MainActivity extends AppCompatActivity {
     }
     private void refreshtoDefault() {
         linearLayout.removeAllViewsInLayout();
-        setStringListPref(this, "topics", popolaLista());
-        addElementsView(getStringListPref(getApplicationContext(), "topics"));
-    }
-    private void refreshData() {
-        linearLayout.removeAllViewsInLayout();
-        addElementsView(getStringListPref(getApplicationContext(), "topics"));
+        setTopicListPref(this, "topics", popolaLista());
+        addElementsView(getTopicListPref(getApplicationContext(), "topics"));
     }
 
-    public static void setStringListPref(Context context, String key, LinkedList<String> values) {
+
+    public static void setTopicListPref(Context context, String key, LinkedList<Topic> values) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
-        JSONArray a = new JSONArray();
-        for (int i = 0; i < values.size(); i++) {
-            a.put(values.get(i));
+        JSONArray jsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+
+        for ( Topic s : values) {
+            try {
+                jsonObject = new JSONObject();
+                jsonObject.put("topic", s.getTopicName());
+                jsonObject.put("maxStudenti", s.getMaxStudenti());
+                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
+
         if (!values.isEmpty()) {
-            editor.putString(key, a.toString());
+          //  Log.w("debug", jsonArray.toString());
+            editor.putString(key, jsonArray.toString());
         } else {
             editor.putString(key, null);
         }
@@ -109,22 +116,23 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static LinkedList<String> getStringListPref(Context context, String key) {
+    public static LinkedList<Topic> getTopicListPref(Context context, String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String json = prefs.getString(key, null);
-        LinkedList<String> urls = new LinkedList<String>();
+        LinkedList<Topic> topicLinkedList = new LinkedList<Topic>();
         if (json != null) {
             try {
-                JSONArray a = new JSONArray(json);
-                for (int i = 0; i < a.length(); i++) {
-                    String url = a.optString(i);
-                    urls.add(url);
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    String topicName = jsonArray.getJSONObject(i).getString("topic");
+                    int maxStudenti = Integer.parseInt(jsonArray.getJSONObject(i).getString("maxStudenti"));
+                    topicLinkedList.add(new Topic(topicName,maxStudenti));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        return urls;
+        return topicLinkedList;
     }
 
 
@@ -160,13 +168,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private LinkedList<String> popolaLista() {
-        LinkedList<String> list = new LinkedList<>();
-        list.add("unict/didattica/aulastudio");
-        list.add("unict/didattica/aula1");
-        list.add("unict/didattica/aula2");
-        list.add("unict/didattica/aula3");
-
+    private LinkedList<Topic> popolaLista() {
+        LinkedList<Topic> list = new LinkedList<>();
+        list.add(new Topic("unict/didattica/aulastudio", 200));
+        list.add(new Topic("unict/didattica/aula1", 30));
+        list.add(new Topic("unict/didattica/aula2"));
+        list.add(new Topic("unict/didattica/aula3",40));
         return list;
     }
 
@@ -205,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-                Log.w("Debug",mqttMessage.toString() + " topic " + topic);
+                Log.w("Mqtt","Messaggio ricevuto: "+mqttMessage.toString() + " topic " + topic);
                //HANDLE ROUTINE;
                ElementsStructure element = map.get(topic);
                element.getTextView().setText(mqttMessage.toString() + "/" + element.getMaxStudenti() );
@@ -219,41 +226,45 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addElementsView(LinkedList list){
+    private void addElementsView(LinkedList<Topic> list){
         //Adding a LinearLayout with VERTICAL orientation
         LinearLayout textLinearLayout = new LinearLayout(this);
         textLinearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(textLinearLayout);
-        Switch aSwitch;
-        TextView t;
-        ProgressBar p;
-        for (final Object s : list) {
-            String[] result = s.toString().split("/");
 
+        Switch aSwitch;
+        TextView textView;
+        ProgressBar progressBar;
+        int maxStudenti;
+
+        for (final Topic topic : list) {
+            maxStudenti = topic.getMaxStudenti();
+
+            String[] result = topic.getTopicName().split("/");
             aSwitch = addSwitch(linearLayout, result[result.length - 1] + " di " + result[result.length - 2]);
 
-//}catch (ArrayIndexOutOfBoundsException e){
-
-            t = addTextView(linearLayout, "/");
-            p = addProgressBar(linearLayout);
+            textView = addTextView(linearLayout, "/");
+            progressBar = addProgressBar(linearLayout);
 
             aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        mqttHelper.subscribeToTopic(s.toString());
-                        map.get(s.toString()).getTextView().setVisibility(View.VISIBLE);
-                        map.get(s.toString()).getProgressBar().setVisibility(View.VISIBLE);
+                        mqttHelper.subscribeToTopic(topic.getTopicName());
+
+                        map.get(topic.getTopicName()).getTextView().setVisibility(View.VISIBLE);
+                        map.get(topic.getTopicName()).getProgressBar().setVisibility(View.VISIBLE);
                     } else {
-                        mqttHelper.unsubscribeToTopic(s.toString());
-                        map.get(s.toString()).getTextView().setVisibility(View.GONE);
-                        map.get(s.toString()).getProgressBar().setVisibility(View.GONE);
+                        mqttHelper.unsubscribeToTopic(topic.getTopicName());
+
+                        map.get(topic.getTopicName()).getTextView().setVisibility(View.GONE);
+                        map.get(topic.getTopicName()).getProgressBar().setVisibility(View.GONE);
                     }
                 }
             });
 
-            map.put(s.toString(), new ElementsStructure(aSwitch, t, p));
+            map.put(topic.getTopicName(), new ElementsStructure(aSwitch, textView, progressBar, maxStudenti ));
 
-            t.setText("waiting");
+            textView.setText("waiting");
 
             addLineSeperator();
             }

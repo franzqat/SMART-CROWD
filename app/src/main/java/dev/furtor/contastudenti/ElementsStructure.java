@@ -8,7 +8,16 @@ public class ElementsStructure {
     private final Switch aSwitch;
     private final TextView textView;
     private  final ProgressBar progressBar;
-    private int maxStudenti = 100; //capienza aula
+    private int maxStudenti; //capienza aula
+
+
+
+    public ElementsStructure(Switch aSwitch, TextView textView, ProgressBar progressBar, int maxStudenti) {
+        this.aSwitch = aSwitch;
+        this.textView = textView;
+        this.progressBar = progressBar;
+        this.maxStudenti = maxStudenti;
+    }
 
     public int getMaxStudenti() {
         return maxStudenti;
@@ -16,12 +25,6 @@ public class ElementsStructure {
 
     public void setMaxStudenti(int maxStudenti) {
         this.maxStudenti = maxStudenti;
-    }
-
-    public ElementsStructure(Switch aSwitch, TextView textView, ProgressBar progressBar) {
-        this.aSwitch = aSwitch;
-        this.textView = textView;
-        this.progressBar = progressBar;
     }
 
     public Switch getaSwitch() {
