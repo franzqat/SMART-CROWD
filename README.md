@@ -12,7 +12,7 @@ Questa applicazione consente di misurare il numero di utenti connessi in un'area
 Occorre configurare lo script in python dal Raspberry Pi per concordare il topic sul quale si desidera pubblicare e successivamente avviarlo.
 Il client si sottoscrive switchando il bottone corrispondente al topic desiderato, se presente, o può aggiungerne uno custom conoscendo il topic.
 
-## Descrizione dettagliata
+## Descrizione
 
 L'architettura sfrutta il protocollo di comunicazione MQTT:
 * Il publisher sfrutta uno script in python per pubblicare i contenuti dell'analisi della rete. L'analisi viene effettuata tramite il tool arp-scan.
