@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
             aSwitch = addSwitch(linearLayout, result[result.length - 1] + " di " + result[result.length - 2]);
 
             textView = addTextView(linearLayout, "/");
-            progressBar = addProgressBar(linearLayout);
+            progressBar = addProgressBar(linearLayout, maxStudenti);
 
             aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -314,9 +314,10 @@ public class MainActivity extends AppCompatActivity {
      * @param textLinearLayout
      * @return
      */
-    private ProgressBar addProgressBar(LinearLayout textLinearLayout) {
+    private ProgressBar addProgressBar(LinearLayout textLinearLayout, int max) {
 
         ProgressBar progressBar =new ProgressBar(getApplicationContext(), null, android.R.attr.progressBarStyleHorizontal);
+        progressBar.setMax(max);
         progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
         textLinearLayout.addView(progressBar);
         progressBar.setVisibility(View.GONE);

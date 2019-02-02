@@ -20,10 +20,11 @@ public class MqttHelper {
 
     final String serverUri = "ssl://m24.cloudmqtt.com:28951";
 
-    final String clientId = "ExampleAndroidClient";
-
-    final String username = "mqttbox";
-    final String password = "123ttbox";
+    //client id deve essere univoco, è hard coded per semplificazione proof of concept
+    final String clientId = "ExampleAndroidClient1";
+    //
+    final String username = "npjfazcj";
+    final String password = "H_BXhBstyAU4";
 
     public MqttHelper(Context context){
         mqttAndroidClient = new MqttAndroidClient(context, serverUri, clientId);

@@ -1,6 +1,5 @@
 <resources>
-    <string name="app_name">ContaStudenti</string>
-    <string name="aula_studio_D1">unict/didattica/aulastudio</string>
-    <string name="title_activity_add_element">AddElementActivity</string>
+    <string name="app_name">SMART CROWD</string>
+    <string name="title_activity_add_element">Aggiungi un nuovo elemento</string>
     <string name="menu_refresh">Refresh</string>
 </resources>
