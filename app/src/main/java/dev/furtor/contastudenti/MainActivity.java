@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             editor.putString("topics", null);
         }
-        editor.commit();
+        editor.apply();
 
     }
 
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove(key);
-        editor.commit();
+        editor.apply();
 
     }
 
