@@ -78,8 +78,6 @@ public class MqttHelper {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-
-
                    // subscribeToTopic();
                 }
 
@@ -98,7 +96,7 @@ public class MqttHelper {
 
     public void subscribeToTopic(final String subscriptionTopic) {
         try {
-            mqttAndroidClient.subscribe(subscriptionTopic, 1, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.w("Mqtt","Subscribed! To " + subscriptionTopic);

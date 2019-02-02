@@ -4,6 +4,7 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+//Struttura per la gestione dei componenti di un elemento
 public class ElementsStructure {
     private final Switch aSwitch;
     private final TextView textView;

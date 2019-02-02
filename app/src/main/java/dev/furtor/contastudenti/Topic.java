@@ -4,7 +4,7 @@ public class Topic {
     private final String topicName;
     private int maxStudenti;
 
-    //default
+    //costruttore di default senza numero max di studenti
     public Topic(String topicName) {
         this.topicName = topicName;
         this.maxStudenti = 100;

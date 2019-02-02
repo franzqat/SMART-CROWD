@@ -1,27 +1,16 @@
 package dev.furtor.contastudenti;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-
-import java.util.LinkedList;
-
 public class addElement extends AppCompatActivity {
-    SharedPreferences sharedPref;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +18,7 @@ public class addElement extends AppCompatActivity {
         setContentView(R.layout.activity_add_element);
 
 
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Button button = findViewById(R.id.buttonSubscribe);
@@ -45,15 +33,18 @@ public class addElement extends AppCompatActivity {
 
                 try {
                 String txtData = testosalvato.getText().toString();
+                //controlla la corretteza del testo inserito
                 if (!checkTesto(txtData)){
+                    //se non è corretto lancia l'eccezione
                     throw new Exception();
                 }
+                //lo lancia nell'intent e lo passa alla main activity
                 i.putExtra("txtData", txtData);
                 startActivity(i);
 
                 } catch (Exception e) {
                     //formato di toast topic non valido
-                    Toast.makeText(getBaseContext(),"Formato Topic non valido", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(),"Il formato del topic deve essere di tipo a/b/c/d con almeno un livello", Toast.LENGTH_LONG).show();
 
                 }
 
@@ -64,8 +55,13 @@ public class addElement extends AppCompatActivity {
         });
     }
 
+    /**
+     * Controlla la correttezza del topic inserito
+     * @param txtData
+     * @return
+     */
     private boolean checkTesto(String txtData) {
-        if (txtData.split("/").length <= 2)
+        if (txtData.split("/").length < 2)
             return false;
         return true;
     }
