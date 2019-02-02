@@ -1,7 +1,5 @@
 package dev.furtor.contastudenti;
 
-
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,42 +48,54 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         LinkedList<Topic> list;
-        list = getTopicListPref(this, "topics");
+        list = getTopicListPref(this);
 
-
+        //Controllo se esiste un messaggio proveniente dall'attività addElement
         if(getIntent().getExtras() != null) {
             Intent i = getIntent();
             String txtData = i.getExtras().getString("txtData", "");
-            // retrieve preference
-
-            list.add(new Topic(txtData)); //default 100 studenti max
-            setTopicListPref(this, "topics", list);
+            // retrieve preference e inserimento in lista
+            list.add(new Topic(txtData));
+            //salvataggio persistente della lista
+            setTopicListPref(this, list);
         }
 
 
         linearLayout = findViewById(R.id.linear_layout);
+        //se la lista è vuota popola la lista ai valori di default
         if (list.isEmpty()){
+            //refresh chiama elementsview al suo interno
             refreshtoDefault();
         }else {
             addElementsView(list);
         }
-
-
+        //avvia mqtt
         startMqtt();
         Log.w("stato","on create");
     }
+
+    /**
+     * Rimuove tutte le view
+     * Setta la lista ai valori di default in maniera persistente
+     * Ricrea le view dei valori di default
+     */
     private void refreshtoDefault() {
         linearLayout.removeAllViewsInLayout();
-        setTopicListPref(this, "topics", popolaLista());
-        addElementsView(getTopicListPref(getApplicationContext(), "topics"));
+        setTopicListPref(this, popolaLista());
+        addElementsView(getTopicListPref(getApplicationContext()));
     }
 
 
-    public static void setTopicListPref(Context context, String key, LinkedList<Topic> values) {
+    /**
+     * Salva il contenuto della lista di topic in maniera persistente legandolo alla chiave topics
+     * @param context
+     * @param values
+     */
+    private static void setTopicListPref(Context context, LinkedList<Topic> values) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         JSONArray jsonArray = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObject;
 
         for ( Topic s : values) {
             try {
@@ -101,13 +111,19 @@ public class MainActivity extends AppCompatActivity {
 
         if (!values.isEmpty()) {
           //  Log.w("debug", jsonArray.toString());
-            editor.putString(key, jsonArray.toString());
+            editor.putString("topics", jsonArray.toString());
         } else {
-            editor.putString(key, null);
+            editor.putString("topics", null);
         }
         editor.commit();
 
     }
+
+    /**
+     * Resetta la preferenza corrispondente alla chiave
+     * @param context
+     * @param key chiave da resettare
+     */
     private void resetListPref(Context context, String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
@@ -116,9 +132,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static LinkedList<Topic> getTopicListPref(Context context, String key) {
+    /**
+     * Get del contenuto della lista di topic in maniera persistente legato alla chiave topics
+     * @param context
+     * @return
+     */
+    private static LinkedList<Topic> getTopicListPref(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String json = prefs.getString(key, null);
+        String json = prefs.getString("topics", null);
         LinkedList<Topic> topicLinkedList = new LinkedList<Topic>();
         if (json != null) {
             try {
@@ -126,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     String topicName = jsonArray.getJSONObject(i).getString("topic");
                     int maxStudenti = Integer.parseInt(jsonArray.getJSONObject(i).getString("maxStudenti"));
+
                     topicLinkedList.add(new Topic(topicName,maxStudenti));
                 }
             } catch (JSONException e) {
@@ -149,13 +171,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            //aggiunta di un nuovo topic, l'intent i porta all'activity addElement per la creazione di un nuovo topic
             case R.id.addelement:
-            //    Toast.makeText(getBaseContext(),"Funzione add non ancora implementata", Toast.LENGTH_LONG).show();
               Intent i = new Intent(this, addElement.class);
-                startActivity(i);
+              startActivity(i);
                 return true;
+            // cancella le preferenze e ripristina la lista dei topic ai valori di default
             case R.id.restore:
                 resetListPref(this, "topics");
                 refreshtoDefault();
@@ -166,8 +190,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
+    /**
+     * Popolazione di default della lista di topics
+     * @return
+     */
     private LinkedList<Topic> popolaLista() {
         LinkedList<Topic> list = new LinkedList<>();
         list.add(new Topic("unict/didattica/aulastudio", 200));
@@ -197,6 +223,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Avvia il processo di MQTT
+     */
     private void startMqtt(){
         mqttHelper = new MqttHelper(getApplicationContext());
         mqttHelper.setCallback(new MqttCallbackExtended() {
@@ -213,8 +242,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
                 Log.w("Mqtt","Messaggio ricevuto: "+mqttMessage.toString() + " topic " + topic);
-               //HANDLE ROUTINE;
+               //Handle message routine;
+                //elementStructure contiene i componenti associati ad un topic
                ElementsStructure element = map.get(topic);
+               //set del numero di studenti e del valore della progress bar associata al topic
                element.getTextView().setText(mqttMessage.toString() + "/" + element.getMaxStudenti() );
                element.getProgressBar().setProgress(Integer.parseInt(mqttMessage.toString()));
             }
@@ -226,6 +257,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Aggiunge la vista di ogni elemento presente nella lista di topics
+     * Conserva i componenti all'interno della mappa associando ciascuno di essi al topic a cui corrispondono
+     * @param list
+     */
     private void addElementsView(LinkedList<Topic> list){
         //Adding a LinearLayout with VERTICAL orientation
         LinearLayout textLinearLayout = new LinearLayout(this);
@@ -239,8 +275,9 @@ public class MainActivity extends AppCompatActivity {
 
         for (final Topic topic : list) {
             maxStudenti = topic.getMaxStudenti();
-
+            //aspetto un result del tipo a/b/c/d
             String[] result = topic.getTopicName().split("/");
+            //si stampano gli ultimi due livelli del topic nello switch
             aSwitch = addSwitch(linearLayout, result[result.length - 1] + " di " + result[result.length - 2]);
 
             textView = addTextView(linearLayout, "/");
@@ -249,13 +286,15 @@ public class MainActivity extends AppCompatActivity {
             aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
+                        //sottoscrizione mqtt a topic
                         mqttHelper.subscribeToTopic(topic.getTopicName());
-
+                        //si rendono visibili la TextView e la Progress Bar
                         map.get(topic.getTopicName()).getTextView().setVisibility(View.VISIBLE);
                         map.get(topic.getTopicName()).getProgressBar().setVisibility(View.VISIBLE);
                     } else {
+                        //annulla la sottoscrizione mqtt al topic
                         mqttHelper.unsubscribeToTopic(topic.getTopicName());
-
+                        //visibilità dei componenti nascosta
                         map.get(topic.getTopicName()).getTextView().setVisibility(View.GONE);
                         map.get(topic.getTopicName()).getProgressBar().setVisibility(View.GONE);
                     }
@@ -263,25 +302,25 @@ public class MainActivity extends AppCompatActivity {
             });
 
             map.put(topic.getTopicName(), new ElementsStructure(aSwitch, textView, progressBar, maxStudenti ));
-
+            //in attesa del primo messaggio viene settato il testo al valore waiting
             textView.setText("waiting");
-
+            //aggiunge una linea di separazione
             addLineSeperator();
             }
 
         }
 
 
-
+    /**
+     * Aggiunge una TextView di default la cui visibilità è posta a GONE
+     * @param textLinearLayout
+     * @param testo
+     * @return
+     */
     private TextView addTextView(LinearLayout textLinearLayout, String testo) {
 
-
-        //linearLayout.addView(textLinearLayout);
         TextView textView = new TextView(this);
-
         textView.setText(testo);
-
-      //  setTextViewAttributes(textView);
         textView.setTextColor(Color.BLACK);
         textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         textLinearLayout.addView(textView);
@@ -289,10 +328,15 @@ public class MainActivity extends AppCompatActivity {
 
         return textView;
     }
+
+    /**
+     * Aggiunge una progressBar di default la cui visibilità è posta a GONE
+     * @param textLinearLayout
+     * @return
+     */
     private ProgressBar addProgressBar(LinearLayout textLinearLayout) {
 
         ProgressBar progressBar =new ProgressBar(getApplicationContext(), null, android.R.attr.progressBarStyleHorizontal);
-        // Apply the layout parameters for progress bar
         progressBar.getProgressDrawable().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
         textLinearLayout.addView(progressBar);
         progressBar.setVisibility(View.GONE);
@@ -302,58 +346,13 @@ public class MainActivity extends AppCompatActivity {
     private Switch addSwitch(LinearLayout textLinearLayout, String testo){
 
         Switch aSwitch = new Switch(this);
-
-        //aSwitch.setTextOff("Monitora "+ testo);
-      // aSwitch.setTextOn("Stop " + testo);
         aSwitch.setText("Monitora " + testo);
         linearLayout.addView(aSwitch);
 
         return aSwitch;
     }
 
-    private void addEditTexts() {
 
-        LinearLayout editTextLayout = new LinearLayout(this);
-        editTextLayout.setOrientation(LinearLayout.VERTICAL);
-
-        linearLayout.addView(editTextLayout);
-
-        for (int i = 1; i <= 3; i++) {
-            EditText editText = new EditText(this);
-            editText.setHint("EditText " + String.valueOf(i));
-            setEditTextAttributes(editText);
-            editTextLayout.addView(editText);
-        }
-        addLineSeperator();
-    }
-
-    private void setEditTextAttributes(EditText editText) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-
-        params.setMargins(convertDpToPixel(16),
-                convertDpToPixel(16),
-                convertDpToPixel(16),
-                0
-        );
-
-        editText.setLayoutParams(params);
-    }
-
-    private void setTextViewAttributes(TextView textView) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-
-        params.setMargins(convertDpToPixel(16),
-                convertDpToPixel(16),
-                0, 0
-        );
-
-        textView.setTextColor(Color.BLACK);
-        textView.setLayoutParams(params);
-    }
 
     //This function to convert DPs to pixels
     private int convertDpToPixel(float dp) {
