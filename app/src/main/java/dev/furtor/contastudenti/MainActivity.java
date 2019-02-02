@@ -7,9 +7,10 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -17,7 +18,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Switch;
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     private static LinkedList<Topic> getTopicListPref(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String json = prefs.getString("topics", null);
-        LinkedList<Topic> topicLinkedList = new LinkedList<Topic>();
+        LinkedList<Topic> topicLinkedList = new LinkedList<>();
         if (json != null) {
             try {
                 JSONArray jsonArray = new JSONArray(json);
@@ -203,26 +203,6 @@ public class MainActivity extends AppCompatActivity {
         return list;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case 111:
-            {
-                if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    try {
-
-                    }
-                    catch(SecurityException e){
-                        Toast.makeText(getApplicationContext(),"Impossibile",Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(),"Impossibile",Toast.LENGTH_LONG).show();
-                }
-                return;
-            }
-        }
-    }
-
     /**
      * Avvia il processo di MQTT
      */
@@ -240,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+            public void messageArrived(String topic, MqttMessage mqttMessage) {
                 Log.w("Mqtt","Messaggio ricevuto: "+mqttMessage.toString() + " topic " + topic);
                //Handle message routine;
                 //elementStructure contiene i componenti associati ad un topic
