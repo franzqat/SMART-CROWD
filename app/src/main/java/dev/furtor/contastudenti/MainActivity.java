@@ -38,12 +38,18 @@ import dev.furtor.contastudenti.helpers.MqttHelper;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "mqtt";
     MqttHelper mqttHelper;
     LinkedHashMap<String, ElementsStructure> map = new LinkedHashMap<>();
     LinearLayout linearLayout;
 
+    public MainActivity(){
+        Log.d(TAG, "Costruttore");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "On Create");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -53,11 +59,12 @@ public class MainActivity extends AppCompatActivity {
         //Controllo se esiste un messaggio proveniente dall'attività addElement
         if(getIntent().getExtras() != null) {
             Intent i = getIntent();
-            String txtData = i.getExtras().getString("txtData", "");
-            // retrieve preference e inserimento in lista
-            list.add(new Topic(txtData));
+            String txtData = i.getExtras().getString("txtData", null);
+            if (txtData != null) {// retrieve preference e inserimento in lista
+                list.add(new Topic(txtData));
             //salvataggio persistente della lista
             setTopicListPref(this, list);
+        }
         }
 
 
@@ -92,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
      * @param values
      */
     private static void setTopicListPref(Context context, LinkedList<Topic> values) {
+        Log.d("debug", "Set topic list pref");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         JSONArray jsonArray = new JSONArray();
@@ -138,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private static LinkedList<Topic> getTopicListPref(Context context) {
+        Log.d("debug", "get topic list pref");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String json = prefs.getString("topics", null);
         LinkedList<Topic> topicLinkedList = new LinkedList<>();
@@ -351,6 +360,32 @@ public class MainActivity extends AppCompatActivity {
         params.setMargins(0, convertDpToPixel(10), 0, convertDpToPixel(10));
         lineLayout.setLayoutParams(params);
         linearLayout.addView(lineLayout);
+    }
+
+
+    @Override
+    public void onStop(){
+        Log.d(TAG, "On Stop");
+        super.onStop();
+    }
+
+    @Override
+    public void onResume(){
+        Log.d(TAG, "On Resume");
+        super.onResume();
+    }
+
+    @Override
+    public void onPause(){
+        Log.d(TAG, "On Pause");
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy(){
+        Log.d(TAG, "On Destroy");
+        mqttHelper.disconnect();
+        super.onDestroy();
     }
 
 }
