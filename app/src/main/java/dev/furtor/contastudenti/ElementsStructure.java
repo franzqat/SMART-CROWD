@@ -10,14 +10,15 @@ public class ElementsStructure {
     private final TextView textView;
     private  final ProgressBar progressBar;
     private int maxStudenti; //capienza aula
+    private int accessPoints;
 
 
-
-    public ElementsStructure(Switch aSwitch, TextView textView, ProgressBar progressBar, int maxStudenti) {
+    public ElementsStructure(Switch aSwitch, TextView textView, ProgressBar progressBar, int maxStudenti, int accessPoints) {
         this.aSwitch = aSwitch;
         this.textView = textView;
         this.progressBar = progressBar;
         this.maxStudenti = maxStudenti;
+        this.accessPoints = accessPoints;
     }
 
     public int getMaxStudenti() {
@@ -38,5 +39,9 @@ public class ElementsStructure {
 
     public ProgressBar getProgressBar() {
         return progressBar;
+    }
+
+    public int getAccessPoints() {
+        return accessPoints;
     }
 }

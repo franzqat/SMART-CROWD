@@ -235,8 +235,9 @@ public class MainActivity extends AppCompatActivity {
                 //elementStructure contiene i componenti associati ad un topic
                ElementsStructure element = map.get(topic);
                //set del numero di studenti e del valore della progress bar associata al topic
-               element.getTextView().setText(mqttMessage.toString() + "/" + element.getMaxStudenti() );
-               element.getProgressBar().setProgress(Integer.parseInt(mqttMessage.toString()));
+                int currentNumber = Integer.parseInt(mqttMessage.toString()) - element.getAccessPoints();
+               element.getTextView().setText(currentNumber + "/" + element.getMaxStudenti() );
+               element.getProgressBar().setProgress(currentNumber);
             }
 
             @Override
@@ -260,10 +261,11 @@ public class MainActivity extends AppCompatActivity {
         Switch aSwitch;
         TextView textView;
         ProgressBar progressBar;
-        int maxStudenti;
+        int maxStudenti, accessPoints;
 
         for (final Topic topic : list) {
             maxStudenti = topic.getMaxStudenti();
+            accessPoints = topic.getAccessPoints();
             //aspetto un result del tipo a/b/c/d
             String[] result = topic.getTopicName().split("/");
             //si stampano gli ultimi due livelli del topic nello switch
@@ -290,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            map.put(topic.getTopicName(), new ElementsStructure(aSwitch, textView, progressBar, maxStudenti ));
+            map.put(topic.getTopicName(), new ElementsStructure(aSwitch, textView, progressBar, maxStudenti, accessPoints ));
             //in attesa del primo messaggio viene settato il testo al valore waiting
             textView.setText("waiting");
             //aggiunge una linea di separazione
